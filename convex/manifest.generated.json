@@ -1,0 +1,56 @@
+{
+  "key": "items",
+  "name": "Items Benchmark",
+  "description": "Generic items/tasks benchmark app. Tests CRUD operations, filtering by status/priority, and batch operations.",
+  "defaultUrl": "",
+  "behaviors": [
+    {
+      "key": "seeder",
+      "name": "Seeder",
+      "description": "Creates test items with random data",
+      "category": "seeder",
+      "configSchema": {
+        "fields": [
+          {
+            "name": "count",
+            "type": "number",
+            "description": "Number of items to create",
+            "default": 100,
+            "minimum": 1,
+            "maximum": 10000
+          },
+          {
+            "name": "batchSize",
+            "type": "number",
+            "description": "Number of items per batch insert",
+            "default": 10,
+            "minimum": 1,
+            "maximum": 100
+          }
+        ],
+        "defaults": {
+          "count": 100,
+          "batchSize": 10
+        }
+      }
+    },
+    {
+      "key": "reader",
+      "name": "Reader",
+      "description": "Query-only workload - reads items by status and priority",
+      "category": "reader"
+    },
+    {
+      "key": "writer",
+      "name": "Writer",
+      "description": "Write-heavy workload - creates and updates items",
+      "category": "writer"
+    },
+    {
+      "key": "mixed",
+      "name": "Mixed",
+      "description": "70% reads, 30% writes - realistic workload simulation",
+      "category": "mixed"
+    }
+  ]
+}
