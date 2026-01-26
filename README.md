@@ -1,8 +1,39 @@
 # Convex Benchmark Template
 
-A template repository for creating Convex load testing benchmark apps with minion behaviors.
+A template repository for creating Convex load testing benchmark apps with minion behaviors. Fork this repo to create your own custom benchmark that works with the [Minions load testing harness](https://github.com/get-convex/minions).
 
-## Quick Start
+## Using with Minions Harness
+
+To run load tests with the Minions harness (EC2/Fargate workers):
+
+1. **Fork this repository** (or use it as a template) to create your own benchmark
+
+2. **Get your Convex Deploy Key:**
+   - Go to your [Convex Dashboard](https://dashboard.convex.dev)
+   - Navigate to Settings → Deploy Keys
+   - Create a new deploy key
+
+3. **Get a GitHub Personal Access Token** (for private repos):
+   - Go to GitHub → Settings → Developer settings → Personal access tokens
+   - Create a token with `repo` scope
+
+4. **In the Minions harness:**
+   - Enter your GitHub repo URL: `github.com/your-org/your-benchmark`
+   - Provide your **Convex Deploy Key** (required - deploys your backend)
+   - Provide your **GitHub Token** (only needed for private repos)
+   - Select behaviors and worker counts
+   - Start the test
+
+The harness will:
+1. Fetch the manifest from your repo to discover available behaviors
+2. Clone your repo on EC2 instances
+3. Run `npm install` to install dependencies
+4. Deploy your Convex backend using the deploy key
+5. Start workers running your behaviors against the deployed backend
+
+## Local Development
+
+### Quick Start
 
 1. **Install dependencies:**
    ```bash
@@ -83,7 +114,31 @@ convex-benchmark-template/
     └── generate-manifest.ts    # Build manifest JSON
 ```
 
-## Customization
+## Creating Your Own Benchmark
+
+1. **Fork or use this template** to create your own repo
+
+2. **Modify the schema** in `convex/schema.ts` for your domain
+
+3. **Add Convex functions** in `convex/` for your app logic
+
+4. **Update the context** in `src/minions/types.ts` and `src/minions/context.ts`
+
+5. **Create behaviors** in `src/minions/behaviors/` (see CLAUDE.md for patterns)
+
+6. **Update the manifest** in `src/minions/manifest.ts`
+
+7. **Regenerate and commit:**
+   ```bash
+   npm run generate:manifest
+   git add convex/manifest.generated.json
+   git commit -m "Update manifest"
+   git push
+   ```
+
+The `manifest.generated.json` file **must be committed** to your repo - the harness fetches it directly from GitHub to discover your behaviors before cloning.
+
+## Customization Guide
 
 See [CLAUDE.md](./CLAUDE.md) for detailed instructions on:
 - Adding new behaviors
@@ -111,6 +166,13 @@ items: defineTable({
   .index("by_priority", ["priority", "updatedAt"])
   .index("by_createdAt", ["createdAt"])
 ```
+
+## Important Notes
+
+- **`manifest.generated.json` must be committed** - The harness fetches this from GitHub before cloning to discover available behaviors
+- **Deploy keys are required** - The harness needs a Convex deploy key to deploy your backend on EC2
+- **GitHub tokens are optional** - Only needed for private repositories
+- The harness creates a preview deployment for each test run to avoid affecting production
 
 ## License
 
