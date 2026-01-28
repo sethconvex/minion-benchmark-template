@@ -40,9 +40,6 @@ export const readerBehavior: MinionBehavior<ItemsContext> = {
       // Randomly pick a read operation
       const operation = ctx.random.int(0, 5);
 
-      const opStart = Date.now();
-      let success = true;
-
       try {
         switch (operation) {
           case 0: {
@@ -93,13 +90,12 @@ export const readerBehavior: MinionBehavior<ItemsContext> = {
           }
         }
       } catch (err) {
-        success = false;
         ctx.log(`ERROR: Read operation failed: ${err}`);
       }
 
-      if (ctx.reportMetric) {
-        ctx.reportMetric(Date.now() - opStart, success);
-      }
+      // Note: We don't call reportMetric() here because these are local cache reads,
+      // not actual Convex calls. The meaningful metric is the TTFR (time-to-first-response)
+      // on the subscription, which is automatically tracked.
 
       // Log progress periodically
       if (iterations % 100 === 0) {
