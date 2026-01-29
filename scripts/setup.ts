@@ -23,9 +23,18 @@ const client = new ConvexHttpClient(CONVEX_URL);
 
 async function main() {
   try {
-    // Clear all items
-    const result = await client.mutation(api.items.clearAll, {});
-    console.log(`[Setup] Cleared ${result.deleted} items`);
+    // Clear all items in batches to stay within Convex read limits
+    let totalDeleted = 0;
+    let hasMore = true;
+    while (hasMore) {
+      const result = await client.mutation(api.items.clearAll, {});
+      totalDeleted += result.deleted;
+      hasMore = result.hasMore;
+      if (hasMore) {
+        console.log(`[Setup] Cleared ${totalDeleted} items so far...`);
+      }
+    }
+    console.log(`[Setup] Cleared ${totalDeleted} items total`);
     console.log("[Setup] Complete - database is clean");
     process.exit(0);
   } catch (error) {

@@ -280,16 +280,16 @@ export const getItemCount = query({
  */
 export const clearAll = mutation({
   args: {},
-  returns: v.object({ deleted: v.number() }),
+  returns: v.object({ deleted: v.number(), hasMore: v.boolean() }),
   handler: async (ctx) => {
-    const items = await ctx.db.query("items").collect();
-    let deleted = 0;
+    const batchSize = 4000;
+    const items = await ctx.db.query("items").take(batchSize);
     for (const item of items) {
       await ctx.db.delete(item._id);
-      deleted++;
     }
+    const deleted = items.length;
     console.log(`[Setup] Cleared ${deleted} items`);
-    return { deleted };
+    return { deleted, hasMore: deleted === batchSize };
   },
 });
 
