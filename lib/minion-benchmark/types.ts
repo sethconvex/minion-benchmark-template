@@ -153,4 +153,8 @@ export interface BenchmarkAppManifest {
   description: string;
   defaultUrl: string;
   behaviors: BehaviorManifest[];
+  /** Default setup script path (e.g., "scripts/setup.ts") */
+  setupScript?: string;
+  /** Default teardown script path */
+  teardownScript?: string;
 }

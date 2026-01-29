@@ -275,6 +275,25 @@ export const getItemCount = query({
 });
 
 /**
+ * Clear all items from the database.
+ * Used as a setup script to ensure a clean slate before each test run.
+ */
+export const clearAll = mutation({
+  args: {},
+  returns: v.object({ deleted: v.number() }),
+  handler: async (ctx) => {
+    const items = await ctx.db.query("items").collect();
+    let deleted = 0;
+    for (const item of items) {
+      await ctx.db.delete(item._id);
+      deleted++;
+    }
+    console.log(`[Setup] Cleared ${deleted} items`);
+    return { deleted };
+  },
+});
+
+/**
  * Get a random item (useful for behaviors that need to pick items to update).
  */
 export const getRandomItem = query({

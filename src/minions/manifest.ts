@@ -15,6 +15,8 @@ export const manifest: BenchmarkAppManifest = {
   description:
     "Generic items/tasks benchmark app. Tests CRUD operations, filtering by status/priority, and batch operations.",
   defaultUrl: process.env.VITE_CONVEX_URL ?? "",
+  // Setup script clears all data for a clean slate
+  setupScript: "scripts/setup.ts",
   behaviors: [
     {
       key: "seeder",

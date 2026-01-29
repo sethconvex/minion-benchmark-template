@@ -3,6 +3,7 @@
   "name": "Items Benchmark",
   "description": "Generic items/tasks benchmark app. Tests CRUD operations, filtering by status/priority, and batch operations.",
   "defaultUrl": "",
+  "setupScript": "scripts/setup.ts",
   "behaviors": [
     {
       "key": "seeder",
