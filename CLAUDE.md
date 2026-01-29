@@ -374,3 +374,5 @@ CONVEX_URL=... npx tsx scripts/run-minion.ts mixed
 - Use `internalMutation` for functions called only from other functions
 - Include explicit `returns` validators on all functions
 - Batch writes when possible to reduce OCC conflicts
+- **NEVER use `.collect()` without a preceding `.take(n)` or tight index range** — Convex enforces a 4096 document read limit per function execution. Any unbounded `.collect()` will crash once the table grows. Use `.take(n)` with a reasonable limit, or paginate with a `hasMore` pattern for bulk operations like clearing tables.
+- When a function must process more documents than the read limit allows, return a `hasMore` flag and have the caller loop in batches
