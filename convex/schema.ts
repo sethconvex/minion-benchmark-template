@@ -23,11 +23,13 @@ export default defineSchema({
     priority: v.number(), // 1-5 (1 = highest priority)
     ownerId: v.optional(v.id("users")),
     tags: v.array(v.string()),
+    projectId: v.optional(v.number()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
     .index("by_status", ["status", "updatedAt"])
     .index("by_owner", ["ownerId", "updatedAt"])
     .index("by_priority", ["priority", "updatedAt"])
-    .index("by_createdAt", ["createdAt"]),
+    .index("by_createdAt", ["createdAt"])
+    .index("by_project", ["projectId", "createdAt"]),
 });

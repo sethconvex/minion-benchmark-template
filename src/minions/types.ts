@@ -11,6 +11,7 @@ export interface Item {
   priority: number;
   ownerId?: string;
   tags: string[];
+  projectId?: number;
   createdAt: number;
   updatedAt: number;
 }
@@ -29,6 +30,7 @@ export interface ItemsContext extends BaseMinionContext {
     status?: string;
     priority?: number;
     tags?: string[];
+    projectId?: number;
   }): Promise<string>;
 
   /** Create multiple items at once (batch) */
@@ -38,6 +40,7 @@ export interface ItemsContext extends BaseMinionContext {
     status?: string;
     priority?: number;
     tags?: string[];
+    projectId?: number;
   }>): Promise<string[]>;
 
   /** Update an existing item */

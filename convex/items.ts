@@ -15,6 +15,7 @@ export const createItem = mutation({
     priority: v.optional(v.number()),
     ownerId: v.optional(v.id("users")),
     tags: v.optional(v.array(v.string())),
+    projectId: v.optional(v.number()),
   },
   returns: v.id("items"),
   handler: async (ctx, args) => {
@@ -26,6 +27,7 @@ export const createItem = mutation({
       priority: args.priority ?? 3,
       ownerId: args.ownerId,
       tags: args.tags ?? [],
+      projectId: args.projectId,
       createdAt: now,
       updatedAt: now,
     });
@@ -46,6 +48,7 @@ export const createItems = mutation({
         priority: v.optional(v.number()),
         ownerId: v.optional(v.id("users")),
         tags: v.optional(v.array(v.string())),
+        projectId: v.optional(v.number()),
       })
     ),
   },
@@ -62,6 +65,7 @@ export const createItems = mutation({
         priority: item.priority ?? 3,
         ownerId: item.ownerId,
         tags: item.tags ?? [],
+        projectId: item.projectId,
         createdAt: now,
         updatedAt: now,
       });
@@ -139,6 +143,7 @@ export const getItem = query({
       priority: v.number(),
       ownerId: v.optional(v.id("users")),
       tags: v.array(v.string()),
+      projectId: v.optional(v.number()),
       createdAt: v.number(),
       updatedAt: v.number(),
     }),
@@ -155,6 +160,7 @@ export const getItem = query({
 export const listItems = query({
   args: {
     status: v.optional(v.string()),
+    projectId: v.optional(v.number()),
     limit: v.optional(v.number()),
   },
   returns: v.array(
@@ -167,12 +173,21 @@ export const listItems = query({
       priority: v.number(),
       ownerId: v.optional(v.id("users")),
       tags: v.array(v.string()),
+      projectId: v.optional(v.number()),
       createdAt: v.number(),
       updatedAt: v.number(),
     })
   ),
   handler: async (ctx, args) => {
     const limit = args.limit ?? 100;
+
+    if (args.projectId !== undefined) {
+      return await ctx.db
+        .query("items")
+        .withIndex("by_project", (q) => q.eq("projectId", args.projectId!))
+        .order("desc")
+        .take(limit);
+    }
 
     if (args.status) {
       return await ctx.db
@@ -208,6 +223,7 @@ export const listByPriority = query({
       priority: v.number(),
       ownerId: v.optional(v.id("users")),
       tags: v.array(v.string()),
+      projectId: v.optional(v.number()),
       createdAt: v.number(),
       updatedAt: v.number(),
     })
@@ -239,6 +255,7 @@ export const listByOwner = query({
       priority: v.number(),
       ownerId: v.optional(v.id("users")),
       tags: v.array(v.string()),
+      projectId: v.optional(v.number()),
       createdAt: v.number(),
       updatedAt: v.number(),
     })
@@ -310,6 +327,7 @@ export const getRandomItem = query({
       priority: v.number(),
       ownerId: v.optional(v.id("users")),
       tags: v.array(v.string()),
+      projectId: v.optional(v.number()),
       createdAt: v.number(),
       updatedAt: v.number(),
     }),

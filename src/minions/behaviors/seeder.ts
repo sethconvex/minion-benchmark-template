@@ -19,6 +19,12 @@ export const seederConfigSchema = z.object({
     .max(100)
     .default(10)
     .describe("Number of items per batch insert"),
+  numProjects: z
+    .number()
+    .min(0)
+    .max(1000)
+    .default(5)
+    .describe("Number of projects to distribute items across (0 = no partitioning)"),
 });
 
 export type SeederConfig = z.infer<typeof seederConfigSchema>;
@@ -73,11 +79,12 @@ export const seederBehavior: MinionBehavior<ItemsContext, SeederConfig> = {
     const config = seederConfigSchema.parse({
       count: (ctx as unknown as Record<string, unknown>).count,
       batchSize: (ctx as unknown as Record<string, unknown>).batchSize,
+      numProjects: (ctx as unknown as Record<string, unknown>).numProjects,
     });
 
-    const { count, batchSize } = config;
+    const { count, batchSize, numProjects } = config;
 
-    ctx.log(`Starting seeder - creating ${count} items in batches of ${batchSize}...`);
+    ctx.log(`Starting seeder - creating ${count} items in batches of ${batchSize}${numProjects > 0 ? ` across ${numProjects} projects` : ""}...`);
 
     const startTime = Date.now();
     let created = 0;
@@ -94,7 +101,8 @@ export const seederBehavior: MinionBehavior<ItemsContext, SeederConfig> = {
       const batch = [];
 
       for (let i = 0; i < currentBatchSize; i++) {
-        const title = `${ctx.random.pick(TITLES)} #${created + i + 1}`;
+        const itemIndex = created + i;
+        const title = `${ctx.random.pick(TITLES)} #${itemIndex + 1}`;
         const status = ctx.random.pick(STATUSES);
         const priority = ctx.random.int(1, 6); // 1-5
         const numTags = ctx.random.int(0, 4);
@@ -106,6 +114,7 @@ export const seederBehavior: MinionBehavior<ItemsContext, SeederConfig> = {
           status,
           priority,
           tags,
+          projectId: numProjects > 0 ? itemIndex % numProjects : undefined,
         });
       }
 
