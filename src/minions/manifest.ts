@@ -8,6 +8,8 @@
 import type { BenchmarkAppManifest } from "../../lib/minion-benchmark";
 import { extractBehaviorConfigInfo } from "../../lib/minion-benchmark";
 import { seederConfigSchema } from "./behaviors/seeder";
+import { readerConfigSchema } from "./behaviors/reader";
+import { writerConfigSchema } from "./behaviors/writer";
 
 export const manifest: BenchmarkAppManifest = {
   key: "items",
@@ -30,12 +32,14 @@ export const manifest: BenchmarkAppManifest = {
       name: "Reader",
       description: "Query-only workload - reads items by status and priority",
       category: "reader",
+      configSchema: extractBehaviorConfigInfo(readerConfigSchema),
     },
     {
       key: "writer",
       name: "Writer",
       description: "Write-heavy workload - creates and updates items",
       category: "writer",
+      configSchema: extractBehaviorConfigInfo(writerConfigSchema),
     },
     {
       key: "mixed",

@@ -1,5 +1,17 @@
+import { z } from "zod";
 import type { MinionBehavior } from "../../../lib/minion-benchmark";
 import type { ItemsContext } from "../types";
+
+export const readerConfigSchema = z.object({
+  numProjects: z
+    .number()
+    .min(0)
+    .max(1000)
+    .default(0)
+    .describe("Number of projects to partition across (0 = no partitioning)"),
+});
+
+export type ReaderConfig = z.infer<typeof readerConfigSchema>;
 
 const STATUSES = ["pending", "active", "completed"];
 
