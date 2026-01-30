@@ -20,6 +20,8 @@ export function createContext(client: ConvexClient): Partial<ItemsContext> & {
   let numProjects = 0;
   let currentUnsubscribe: (() => void) | undefined;
 
+  let subscribed = false;
+
   // Subscribe to items, optionally scoped to a projectId
   const subscribeToItems = (projectId?: number) => {
     // Unsubscribe from previous subscription if any
@@ -27,6 +29,7 @@ export function createContext(client: ConvexClient): Partial<ItemsContext> & {
       currentUnsubscribe();
     }
 
+    subscribed = true;
     const args: { limit: number; projectId?: number } = { limit: 1000 };
     if (projectId !== undefined) {
       args.projectId = projectId;
@@ -52,8 +55,12 @@ export function createContext(client: ConvexClient): Partial<ItemsContext> & {
     });
   };
 
-  // Start unscoped subscription immediately (browser / no-setup usage)
-  subscribeToItems();
+  // Lazily subscribe on first read access
+  const ensureSubscribed = () => {
+    if (!subscribed) {
+      subscribeToItems(assignedProjectId);
+    }
+  };
 
   const context: Partial<ItemsContext> & {
     _configure?: (config: Record<string, unknown>) => void;
@@ -123,21 +130,32 @@ export function createContext(client: ConvexClient): Partial<ItemsContext> & {
 
     // ============== Queries ==============
 
-    getItems: () => cachedItems,
+    getItems: () => {
+      ensureSubscribed();
+      return cachedItems;
+    },
 
-    getItemsByStatus: (status) =>
-      cachedItems.filter((item) => item.status === status),
+    getItemsByStatus: (status) => {
+      ensureSubscribed();
+      return cachedItems.filter((item) => item.status === status);
+    },
 
-    getItemsByPriority: (priority) =>
-      cachedItems.filter((item) => item.priority === priority),
+    getItemsByPriority: (priority) => {
+      ensureSubscribed();
+      return cachedItems.filter((item) => item.priority === priority);
+    },
 
     getRandomItem: () => {
+      ensureSubscribed();
       if (cachedItems.length === 0) return null;
       const randomIndex = Math.floor(Math.random() * cachedItems.length);
       return cachedItems[randomIndex];
     },
 
-    getItemCount: () => cachedItems.length,
+    getItemCount: () => {
+      ensureSubscribed();
+      return cachedItems.length;
+    },
   };
 
   return context;
