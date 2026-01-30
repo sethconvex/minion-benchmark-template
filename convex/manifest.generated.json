@@ -27,11 +27,20 @@
             "default": 10,
             "minimum": 1,
             "maximum": 100
+          },
+          {
+            "name": "numProjects",
+            "type": "number",
+            "description": "Number of projects to distribute items across (0 = no partitioning)",
+            "default": 5,
+            "minimum": 0,
+            "maximum": 1000
           }
         ],
         "defaults": {
           "count": 100,
-          "batchSize": 10
+          "batchSize": 10,
+          "numProjects": 5
         }
       }
     },
@@ -39,13 +48,43 @@
       "key": "reader",
       "name": "Reader",
       "description": "Query-only workload - reads items by status and priority",
-      "category": "reader"
+      "category": "reader",
+      "configSchema": {
+        "fields": [
+          {
+            "name": "numProjects",
+            "type": "number",
+            "description": "Number of projects to partition across (0 = no partitioning)",
+            "default": 0,
+            "minimum": 0,
+            "maximum": 1000
+          }
+        ],
+        "defaults": {
+          "numProjects": 0
+        }
+      }
     },
     {
       "key": "writer",
       "name": "Writer",
       "description": "Write-heavy workload - creates and updates items",
-      "category": "writer"
+      "category": "writer",
+      "configSchema": {
+        "fields": [
+          {
+            "name": "numProjects",
+            "type": "number",
+            "description": "Number of projects to partition across (0 = no partitioning)",
+            "default": 0,
+            "minimum": 0,
+            "maximum": 1000
+          }
+        ],
+        "defaults": {
+          "numProjects": 0
+        }
+      }
     },
     {
       "key": "mixed",
