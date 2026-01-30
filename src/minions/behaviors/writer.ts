@@ -127,7 +127,7 @@ export const writerBehavior: MinionBehavior<ItemsContext> = {
       }
 
       // Small delay between writes
-      await ctx.sleep(ctx.random.int(50, 200));
+      await ctx.sleep(ctx.random.int(5, 20));
     }
 
     const totalTime = Math.round((Date.now() - startTime) / 1000);
